@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="french">
+    <head>
+        <title>Shout Room</title>
+        <meta charset="UTF-8">
+        <meta name=description content="A shout room">
+        <meta name=viewport content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link href="shoutroom.css" rel="stylesheet" media="screen">
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="text-center">Shout Room</h1>
+
+            <div id="shoutroom">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <h1 id="room"></h1>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <div id="shouts">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <input type="text" name="shout" id="inputShout" class="form-control" required="required">
+
+        </div>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+        <script>
+            function init() {
+                $.getJSON('/shout/last', function(data) {
+                        $('#room').text(data.room);
+                        refreshShouts(data);
+                    });
+
+                $('#inputShout').keypress(function(event) {
+                    if(event.keyCode === 13) {
+                        var shout = {
+                            room: 'My beautiful room',
+                            shout: {
+                                author: 'anonymous' || $('#author'),
+                                message: this.value,
+                                date: Date.now()
+                            }
+                        };
+                        $.post('/shout', shout, refreshShouts);
+                    }
+                });
+            }
+
+            _author = 'anonymous';
+
+            function isMe(author) {
+                return _author === author;
+            }
+
+            function blockquoteReverse(author) {
+                return isMe(author) ? 'blockquote-reverse' : '';
+            }
+
+            function templatize(shout) {
+                var template =  '<blockquote class="shout ' + blockquoteReverse(shout.author) + '">' +
+                                                '<p class="message">' + shout.message + '</p>' +
+                                                '<footer class="footer">' +
+                                                    '<span class="author">' + shout.author + '</span>' +
+                                                    '<span>' + ' - ' + '</span>' +
+                                                    '<span class="date">' + new Date(Number(shout.date)).toLocaleDateString() + '</span>' +
+                                                '</footer>' +
+                                            ' </div>';
+                return template;
+            }
+
+            function refreshShouts(data) {
+                var shoutsDiv = $('#shouts');
+                shoutsDiv.empty();
+                var shouts = data.echos;
+                shouts.forEach(function(shout) {
+                    var newShout = templatize(shout);
+                    shoutsDiv.append(newShout);
+                });
+            }
+
+            init();
+        </script>
+    </body>
+</html>
