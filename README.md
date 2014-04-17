@@ -27,8 +27,18 @@ Try the [demo >>](http://tranquil-cliffs-6650.herokuapp.com/client/)
 
 ## test and deploy
 
-* run the server: `node server/app.js`
 * run the tests: `grunt test`
 * deploy on node stack: `git push heroku master`
 
 ![TEST AND DEPLOY or Seek and Destroy](http://cl.ly/image/021F0X2h1W1W/test-and-deploy-or-seek-and-destroy-1.png)
+
+# Evolution
+
+1. shoutroom as an node express module
+```js
+var express = require('express'),
+    app = express();
+var shoutroom = require('shoutroom');
+var baseroute = '/api/chat';
+shoutroom.init(app, baseroute);
+```
